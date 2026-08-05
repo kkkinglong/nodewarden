@@ -1,0 +1,26 @@
+name: Sync Upstream
+
+permissions:
+  write-all
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # 每周一 00:00 运行
+  workflow_dispatch:     # 允许手动触发
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main  # 同步到本地分支
+          fetch-depth: 0
+
+      - name: Sync Upstream
+        uses: zhangnew/sync-upstream@v1
+        with:
+          upstream: shuaiplus/nodewarden  # 上游仓库的 owner/repo
+          upstream-branch: main          # 上游仓库的分支
+          branch: main                   # 本地分支
