@@ -1,22 +1,31 @@
+name: Sync Upstream
+
+permissions:
+  write-all
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
 jobs:
   sync-upstream:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
 
-      - name: Sync upstream with merge
+      - name: Merge upstream changes
         run: |
           git remote add upstream https://github.com/shuaiplus/nodewarden.git
           git fetch upstream main
-          # 尝试合并，若冲突则自动接受上游版本
+          # 尝试合并，冲突时自动使用上游版本
           if ! git merge upstream/main --no-edit; then
-            echo "Merge conflict detected, resolving by accepting upstream changes..."
+            echo "Conflicts detected, accepting upstream version..."
             git checkout --theirs .
             git add .
-            git commit -m "Merge upstream/main and resolve conflicts by accepting upstream"
+            git commit -m "Merge upstream/main, auto-resolve conflicts with upstream"
           fi
           git push origin main
